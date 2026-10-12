@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Admin {
+  id           String         @id @db.Uuid
+  email        String
+  passwordHash String         @map("password_hash")
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  sessions     AdminSession[]
+
+  @@map("admins")
+}
+
+model AdminSession {
+  tokenHash String   @id @map("token_hash")
+  adminId   String   @map("admin_id") @db.Uuid
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  admin     Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt], map: "admin_sessions_expiry_idx")
+  @@map("admin_sessions")
+}
+
+model Job {
+  id           String        @id @db.Uuid
+  slug         String        @unique
+  title        String
+  department   String
+  location     String
+  contractType String        @map("contract_type")
+  workMode     String        @map("work_mode")
+  summary      String
+  description  String
+  status       String        @default("draft")
+  publishedAt  DateTime?     @map("published_at") @db.Timestamptz(6)
+  closingAt    DateTime?     @map("closing_at") @db.Date
+  formFields   Json          @default("[]") @map("form_fields") @db.JsonB
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
+  applications Application[]
+
+  @@index([status, publishedAt(sort: Desc)], map: "jobs_publication_idx")
+  @@map("jobs")
+}
+
+model Application {
+  id               String   @id @db.Uuid
+  jobId            String   @map("job_id") @db.Uuid
+  fullName         String   @map("full_name")
+  email            String
+  phone            String
+  answers          Json     @default("{}") @db.JsonB
+  resumeData       Bytes?   @map("resume_data") @db.ByteA
+  hasResume        Boolean  @default(false) @map("has_resume")
+  resumeKey        String?  @map("resume_key")
+  resumeVersionId  String?  @map("resume_version_id")
+  status           String   @default("new")
+  qualification    String   @default("to_review")
+  score            Int?
+  priority         Boolean  @default(false)
+  assessmentNotes  String   @default("") @map("assessment_notes") @db.Text
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  job              Job      @relation(fields: [jobId], references: [id], onDelete: Restrict)
+
+  @@index([createdAt(sort: Desc)], map: "applications_recent_idx")
+  @@index([jobId, status, createdAt(sort: Desc)], map: "applications_job_idx")
+  @@map("applications")
+}
+
+model RequestRateLimit {
+  bucketKey       String    @id @map("bucket_key")
+  attempts        Int       @default(0)
+  windowStartedAt DateTime  @default(now()) @map("window_started_at") @db.Timestamptz(6)
+  blockedUntil    DateTime? @map("blocked_until") @db.Timestamptz(6)
+
+  @@index([windowStartedAt], map: "request_rate_limits_window_idx")
+  @@map("request_rate_limits")
+}
+
+model StorageDeletionQueue {
+  objectKey   String   @id @map("object_key")
+  versionId   String?  @map("version_id")
+  requestedAt DateTime @default(now()) @map("requested_at") @db.Timestamptz(6)
+
+  @@map("storage_deletion_queue")
+}
