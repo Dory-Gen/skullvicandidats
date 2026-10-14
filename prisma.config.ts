@@ -1,5 +1,6 @@
 import { loadEnvConfig } from "@next/env";
 import { defineConfig } from "prisma/config";
+import { normalizeDatabaseUrl } from "./lib/database-url";
 
 loadEnvConfig(process.cwd());
 
@@ -9,8 +10,9 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url:
+    url: normalizeDatabaseUrl(
       process.env.DATABASE_URL ??
       "postgresql://USER:PASSWORD@localhost:5432/candidatures?schema=public",
+    ),
   },
 });
