@@ -35,9 +35,22 @@ const EMPTY_DRAFT: JobDraft = {
 
 async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { credentials: "same-origin", ...init });
-  const result = await response.json();
+  const body = await response.text();
+  let result: unknown;
+  try {
+    result = JSON.parse(body);
+  } catch {
+    throw new Error(
+      `Le serveur a renvoyé une réponse invalide (HTTP ${response.status}). Consultez les journaux des fonctions API dans Vercel.`,
+    );
+  }
   if (!response.ok) {
-    throw new Error(result.error ?? "Une erreur est survenue.");
+    const message =
+      typeof result === "object" && result !== null && "error" in result &&
+      typeof result.error === "string"
+        ? result.error
+        : "Une erreur est survenue.";
+    throw new Error(message);
   }
   return result as T;
 }

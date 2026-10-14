@@ -64,7 +64,7 @@ Application Next.js pour publier des offres d’emploi, créer un formulaire par
 - En production, utiliser HTTPS, des secrets gérés par l’hébergeur, TLS vers PostgreSQL et des sauvegardes chiffrées. Les CV étant stockés dans PostgreSQL, dimensionner la base et ses sauvegardes en conséquence. Ajouter un scan antivirus/quarantaine des fichiers selon les exigences de l’organisation avant de les rendre accessibles aux recruteurs.
 - Définir la durée de conservation et le processus de suppression des données candidats selon les obligations légales applicables. Limiter l’accès administrateur et auditer régulièrement les comptes.
 - Planifier `pnpm db:cleanup` au moins quotidiennement : il vide, si nécessaire, la file de suppression des anciens CV S3 et purge les sessions et limites de débit expirées.
-- Exécuter `pnpm db:migrate` une fois contre la base cible avant de démarrer les instances web. Le schéma est défini dans `prisma/schema.prisma` ; exécuter `pnpm db:generate` après chaque modification du schéma.
+- Le build Vercel applique automatiquement `pnpm db:migrate` avant le build en environnement Production. Définir `DATABASE_URL` dans les variables Vercel de Production pour que cette migration puisse se connecter à PostgreSQL. Les déploiements Preview n’appliquent pas les migrations ; utiliser une base Preview déjà migrée ou y exécuter `pnpm db:migrate` séparément. Le premier compte administrateur reste à créer une fois avec `pnpm db:bootstrap-admin`. Le schéma est défini dans `prisma/schema.prisma` ; exécuter `pnpm db:generate` après chaque modification du schéma.
 
 ## Vérifications
 
