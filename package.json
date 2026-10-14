@@ -2,7 +2,11 @@
   "name": "candidats",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "prisma generate && next dev",
     "build": "prisma generate && next build",
     "start": "next start",
