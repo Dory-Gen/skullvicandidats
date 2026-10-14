@@ -25,7 +25,7 @@ export default function AdminLoginScreen({
   return (
     <main className="login-screen">
       <Link className="brand login-brand" href="/">
-        <span className="brand-mark">k.</span><span>kora<span className="brand-light">talents</span></span>
+        <span className="brand-light">skullvi</span>
       </Link>
       <div className="login-illustration">
         <span className="login-illustration-spark">✳</span>
