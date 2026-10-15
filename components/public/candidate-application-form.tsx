@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { createDemoApplication } from "@/lib/demo-store";
 import type {
   FormField,
 } from "@/lib/types";
@@ -25,30 +26,21 @@ export default function CandidateApplicationForm({
       setError("Ajoutez votre CV au format PDF pour continuer.");
       return;
     }
-    if (file.size > 8 * 1024 * 1024 || file.type !== "application/pdf") {
+    if (file.size < 8 || file.size > 8 * 1024 * 1024 || file.type !== "application/pdf") {
       setError("Votre CV doit être un fichier PDF de 8 Mo maximum.");
       return;
     }
 
     setSubmitting(true);
     try {
-      const body = new FormData();
-      body.set("jobSlug", slug);
-      body.set("answers", JSON.stringify(answers));
-      body.set("resume", file);
-      const response = await fetch("/api/public/applications", {
-        method: "POST",
-        body,
-        credentials: "same-origin",
-      });
-      const result: { error?: string } = await response.json();
-      if (!response.ok) {
-        setError(result.error ?? "Votre candidature n’a pas pu être envoyée.");
+      if ((await file.slice(0, 5).text()) !== "%PDF-") {
+        setError("Le fichier joint n’est pas un PDF valide.");
         return;
       }
+      await createDemoApplication(slug, answers, file);
       setSent(true);
-    } catch {
-      setError("La connexion a échoué. Vérifiez votre réseau et réessayez.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Votre candidature n’a pas pu être enregistrée.");
     } finally {
       setSubmitting(false);
     }

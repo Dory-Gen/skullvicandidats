@@ -1,5 +1,5 @@
-import AdminConsole from "@/components/admin/admin-console";
+import DemoAdminConsole from "@/components/admin/demo-admin-console";
 
 export default function AdminPage() {
-  return <AdminConsole />;
+  return <DemoAdminConsole />;
 }

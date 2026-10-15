@@ -1,8 +1,5 @@
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { connection } from "next/server";
-import JobPageContent, { JobPageLoading } from "@/components/public/job-page-content";
-import { getPublishedJobBySlug } from "@/lib/jobs";
+import DemoJobPage from "@/components/public/demo-job-page";
 
 export default function JobPage({
   params,
@@ -10,17 +7,13 @@ export default function JobPage({
   params: Promise<{ slug: string }>;
 }) {
   return (
-    <Suspense fallback={<JobPageLoading />}>
-      <JobDetail params={params} />
+    <Suspense fallback={null}>
+      <DemoJob params={params} />
     </Suspense>
   );
 }
 
-async function JobDetail({ params }: { params: Promise<{ slug: string }> }) {
-  await connection();
+async function DemoJob({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const job = await getPublishedJobBySlug(slug);
-  if (!job) notFound();
-
-  return <JobPageContent job={job} />;
+  return <DemoJobPage slug={slug} />;
 }

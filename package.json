@@ -6,17 +6,12 @@
     "node": "22.x"
   },
   "scripts": {
-    "postinstall": "prisma generate",
-    "dev": "prisma generate && next dev",
-    "build": "prisma generate && next build",
-    "vercel-build": "if [ \"$VERCEL_ENV\" = \"production\" ]; then prisma migrate deploy; fi && pnpm build",
+    "dev": "next dev",
+    "build": "next build",
+    "vercel-build": "pnpm build",
     "start": "next start",
     "lint": "eslint",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate deploy",
-    "db:bootstrap-admin": "prisma generate && tsx --env-file=.env.local scripts/bootstrap-admin.mjs",
-    "db:reset-admin-password": "prisma generate && tsx --env-file=.env.local scripts/reset-admin-password.mjs",
-    "db:cleanup": "prisma generate && tsx --env-file=.env.local scripts/cleanup.mjs"
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1148.0",
